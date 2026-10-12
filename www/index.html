@@ -51,6 +51,65 @@ const save=()=>st.set("tl_db",db);
 const M=[["neck","الرقبة"],["shoulder","الكتف"],["chest","الصدر"],["waist","الوسط"],["hip","الورك"],["sleeve","الكم"],["length","الطول الكلي"],["cuff","محيط الكم"]];
 const FAB=["قطن","صوف","حرير","كتان","بوليستر","أخرى"];
 let view="home",q="";
+
+/* Language support: Arabic default + Bangla (Bangladesh) */
+db.set=db.set||{shop:"التارزي",cc:"",sup:"",theme:"auto"};
+if(!db.set.lang)db.set.lang="ar";
+const LANG={
+"إغلاق":"বন্ধ করুন","دخول":"প্রবেশ করুন","كلمة المرور":"পাসওয়ার্ড","كلمة المرور خاطئة":"পাসওয়ার্ড ভুল",
+"لوحة الإدارة":"অ্যাডমিন প্যানেল","توليد مفتاح دائم":"স্থায়ী অ্যাক্টিভেশন কী তৈরি করুন","المفاتيح":"কীসমূহ","لا توجد مفاتيح":"কোনো কী নেই",
+"فعّال":"সক্রিয়","ملغى":"বাতিল","إعادة تفعيل":"আবার সক্রিয় করুন","إلغاء":"বাতিল করুন","نسخ":"কপি","الأجهزة المفعّلة":"সক্রিয় ডিভাইস",
+"هذا الجهاز:":"এই ডিভাইস:","ينتهي ":"মেয়াদ শেষ ","دائم":"স্থায়ী","هذا الجهاز على التجربة المجانية":"এই ডিভাইসটি বিনামূল্যের পরীক্ষামূলক সময়ে আছে",
+"ملاحظة: الإلغاء يسري على هذا الجهاز فقط لأن التطبيق يعمل بدون سيرفر.":"দ্রষ্টব্য: সার্ভার ছাড়া অ্যাপটি কাজ করে বলে বাতিলকরণ শুধু এই ডিভাইসেই কার্যকর হবে।",
+"تم النسخ":"কপি হয়েছে","مفتاح غير صالح":"অবৈধ অ্যাক্টিভেশন কী","المفتاح ملغى":"কীটি বাতিল করা হয়েছে","تم التفعيل ✅":"সক্রিয় করা হয়েছে ✅",
+"مرحباً، أرغب بشراء مفتاح تفعيل لتطبيق التارزي":"হ্যালো, আমি আল-তারজি অ্যাপের জন্য একটি অ্যাক্টিভেশন কী কিনতে চাই",
+"أضف رقم الدعم من الإعدادات":"সেটিংস থেকে সাপোর্ট নম্বর যোগ করুন","انتهت الفترة التجريبية":"পরীক্ষামূলক সময় শেষ হয়েছে",
+"أدخل مفتاح التفعيل للمتابعة":"চালিয়ে যেতে অ্যাক্টিভেশন কী লিখুন","تفعيل":"সক্রিয় করুন","شراء مفتاح عبر واتساب":"হোয়াটসঅ্যাপের মাধ্যমে কী কিনুন",
+"الرئيسية":"হোম","طلب جديد":"নতুন অর্ডার","الزبائن":"গ্রাহক","الأرشيف":"আর্কাইভ","أدوات":"টুলস",
+"تجربة: ":"পরীক্ষামূলক সময়: "," يوم":" দিন","🔍 بحث بالاسم أو الهاتف أو رقم الطلب":"🔍 নাম, ফোন বা অর্ডার নম্বর দিয়ে খুঁজুন",
+"لا نتائج":"কোনো ফলাফল নেই","⏰ تسليم قريب (":"⏰ শিগগির ডেলিভারি (","الطلبات الحالية (":"বর্তমান অর্ডার (",
+"لا توجد طلبات. اضغط ➕ لإضافة طلب":"কোনো অর্ডার নেই। নতুন অর্ডার যোগ করতে ➕ চাপুন","🔍 بحث عن زبون":"🔍 গ্রাহক খুঁজুন",
+"اضغط لطلب جديد بنفس المقاسات":"একই মাপ দিয়ে নতুন অর্ডারের জন্য চাপুন","لا يوجد زبائن":"কোনো গ্রাহক নেই",
+"📦 الطلبات المُسلَّمة":"📦 ডেলিভারি সম্পন্ন অর্ডার","🔍 بحث":"🔍 খুঁজুন","الأرشيف فارغ":"আর্কাইভ খালি",
+"تعديل طلب #":"অর্ডার সম্পাদনা #","➕ طلب جديد":"➕ নতুন অর্ডার","اسم الزبون":"গ্রাহকের নাম","رقم الهاتف":"ফোন নম্বর",
+"📏 المقاسات (سم)":"📏 মাপ (সেমি)","الرقبة":"গলা","الكتف":"কাঁধ","الصدر":"বুক","الوسط":"কোমর","الورك":"নিতম্ব",
+"الكم":"হাতা","الطول الكلي":"মোট দৈর্ঘ্য","محيط الكم":"হাতার পরিধি","نوع القماش":"কাপড়ের ধরন",
+"قطن":"সুতি","صوف":"উল","حرير":"সিল্ক","كتان":"লিনেন","بوليستر":"পলিয়েস্টার","أخرى":"অন্যান্য","اللون":"রং",
+"📷 صورة القماش أو التصميم":"📷 কাপড় বা ডিজাইনের ছবি","الإجمالي":"মোট","العربون":"অগ্রিম","المتبقي: ":"বাকি: ",
+"موعد التسليم":"ডেলিভারির তারিখ","ملاحظات":"নোট","💾 حفظ الطلب":"💾 অর্ডার সংরক্ষণ করুন",
+"تم استرجاع المقاسات":"মাপ পুনরুদ্ধার করা হয়েছে","المطلوب: ":"প্রয়োজন: "," متر":" মিটার",
+"الحساب = (الطول + الكم + 20 سم زيادة للحياكة) × عدد القطع":"হিসাব = (দৈর্ঘ্য + হাতা + সেলাইয়ের জন্য অতিরিক্ত ২০ সেমি) × পিসের সংখ্যা",
+"🧮 حاسبة القماش":"🧮 কাপড়ের হিসাব","طول الكم (سم)":"হাতার দৈর্ঘ্য (সেমি)","عدد القطع":"পিসের সংখ্যা",
+"🎨 المظهر":"🎨 চেহারা","تلقائي":"স্বয়ংক্রিয়","فاتح":"হালকা","داكن":"গাঢ়","⚙️ الإعدادات":"⚙️ সেটিংস",
+"اسم المحل":"দোকানের নাম","رمز الدولة للواتساب (مثال 218)":"হোয়াটসঅ্যাপের দেশের কোড (যেমন 880)","رقم واتساب الدعم":"সাপোর্ট হোয়াটসঅ্যাপ নম্বর",
+"💾 النسخ الاحتياطي":"💾 ব্যাকআপ","تصدير (JSON)":"এক্সপোর্ট (JSON)","تصدير الطلبات (CSV)":"অর্ডার এক্সপোর্ট (CSV)",
+"استيراد ملف نسخة":"ব্যাকআপ ফাইল ইমপোর্ট করুন","💬 الدعم الفني / شراء مفتاح":"💬 প্রযুক্তিগত সহায়তা / কী কিনুন",
+"النسخة جاهزة":"ব্যাকআপ প্রস্তুত","إن لم يبدأ التنزيل تلقائياً، انسخ النص واحفظه في ملف.":"ডাউনলোড স্বয়ংক্রিয়ভাবে শুরু না হলে, লেখাটি কপি করে একটি ফাইলে সংরক্ষণ করুন।",
+"تمت الاستعادة ✅":"পুনরুদ্ধার সম্পন্ন ✅","ملف غير صالح":"অবৈধ ফাইল","تم الحفظ ✅":"সংরক্ষণ করা হয়েছে ✅",
+"اكتب اسم الزبون":"গ্রাহকের নাম লিখুন","اكتب الإجمالي":"মোট মূল্য লিখুন",
+"تأكيد التسليم؟ سيُنقل الطلب إلى الأرشيف.":"ডেলিভারি নিশ্চিত করবেন? অর্ডারটি আর্কাইভে যাবে।",
+"حذف الطلب نهائياً؟":"অর্ডার স্থায়ীভাবে মুছে ফেলবেন?","نُقل إلى الأرشيف":"আর্কাইভে সরানো হয়েছে",
+"طلب #":"অর্ডার #","مُسلَّم":"ডেলিভারি সম্পন্ন","جاهز":"প্রস্তুত","متأخر ":"বিলম্বিত ",
+"اليوم":"আজ","غداً":"আগামীকাল","بعد يومين":"দুই দিন পর","الإجمالي: ":"মোট: ","العربون: ":"অগ্রিম: ",
+"التسليم: ":"ডেলিভারি: ","إيصال واتساب":"হোয়াটসঅ্যাপ রসিদ","الطلب جاهز + إشعار الزبون":"অর্ডার প্রস্তুত + গ্রাহককে জানান",
+"إعادة إشعار الجاهزية":"প্রস্তুতির বিজ্ঞপ্তি আবার পাঠান","تسجيل دفعة":"পেমেন্ট নথিভুক্ত করুন","حفظ":"সংরক্ষণ করুন",
+"تم":"সম্পন্ন","↩️ إعادة من الأرشيف":"↩️ আর্কাইভ থেকে ফিরিয়ে আনুন","🗑 حذف":"🗑 মুছুন",
+"شكراً لثقتكم":"আপনার আস্থার জন্য ধন্যবাদ","مرحباً ":"হ্যালো ","طلبك رقم #":"আপনার অর্ডার নম্বর #",
+" جاهز للاستلام من ":" সংগ্রহের জন্য প্রস্তুত, দোকান: ","المتبقي للدفع: ":"পরিশোধের বাকি: ",
+"اللغة / Language":"ভাষা / Language","العربية (اللغة الرئيسية)":"আরবি (প্রধান ভাষা)","বাংলা (বাংলাদেশ)":"বাংলা (বাংলাদেশ)",
+"مرحباً، أحتاج مساعدة في تطبيق التارزي":"হ্যালো, আল-তারজি অ্যাপ ব্যবহারে আমার সাহায্য দরকার",
+"مفتاح غير صالح":"অবৈধ অ্যাক্টিভেশন কী","هذا الجهاز على التجربة المجانية":"এই ডিভাইসটি বিনামূল্যের পরীক্ষামূলক সময়ে আছে"
+};
+const LANG_KEYS=Object.keys(LANG).sort((a,b)=>b.length-a.length);
+function trBangla(s){if(db.set.lang!=="bn")return s;let out=s;for(const k of LANG_KEYS)out=out.split(k).join(LANG[k]);return out}
+function localizeNode(node){if(db.set.lang!=="bn")return;if(node.nodeType===Node.TEXT_NODE){const v=trBangla(node.nodeValue);if(v!==node.nodeValue)node.nodeValue=v;return}if(node.nodeType!==Node.ELEMENT_NODE)return;
+for(const a of ["placeholder","title","aria-label"]){if(node.hasAttribute(a)){const v=trBangla(node.getAttribute(a));if(v!==node.getAttribute(a))node.setAttribute(a,v)}}
+for(const c of node.childNodes)localizeNode(c)}
+function applyLanguage(){const bn=db.set.lang==="bn";document.documentElement.lang=bn?"bn-BD":"ar";document.documentElement.dir=bn?"ltr":"rtl";document.body.dir=bn?"ltr":"rtl";document.documentElement.style.fontFamily=bn?'system-ui,"Noto Sans Bengali","Noto Sans",sans-serif':''}
+const langObserver=new MutationObserver(ms=>{if(db.set.lang!=="bn")return;for(const m of ms){if(m.type==="childList")for(const n of m.addedNodes)localizeNode(n);else if(m.type==="characterData")localizeNode(m.target)}});
+langObserver.observe(document.body,{subtree:true,childList:true,characterData:true});
+function setLanguage(v){db.set.lang=v;save();applyLanguage();render();toast(v==="bn"?"ভাষা পরিবর্তন করা হয়েছে":"تم تحديث اللغة")}
+
 // theme
 function theme(){const t=db.set.theme;if(t==="auto")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",t)}
 // license
@@ -126,15 +185,17 @@ function saveOrder(){const name=$("#n").value.trim(),phone=$("#p").value.trim();
  if(editId)Object.assign(db.orders.find(x=>x.id===editId),d);else db.orders.push(Object.assign({id:++db.seq,status:"new",created:Date.now()},d));
  save();toast("تم الحفظ ✅");setView("home")}
 function more(){const t=db.set.theme;$("#v").innerHTML='<div class="card"><b>🧮 حاسبة القماش</b><div class="grid"><div><label>الطول الكلي (سم)</label><input id="cl_" type="number" inputmode="decimal" oninput="fc()"></div><div><label>طول الكم (سم)</label><input id="cs_" type="number" inputmode="decimal" oninput="fc()"></div></div><label>عدد القطع</label><input id="cn_" type="number" inputmode="numeric" value="1" oninput="fc()"><div style="font-size:20px">المطلوب: <b id="fr">0</b> متر</div><div class="mut">الحساب = (الطول + الكم + 20 سم زيادة للحياكة) × عدد القطع</div></div>'+
- '<div class="card"><b>🎨 المظهر</b><div class="row" style="margin-top:8px">'+[["auto","تلقائي"],["light","فاتح"],["dark","داكن"]].map(x=>'<button class="btn '+(t===x[0]?'':'s')+'" onclick="db.set.theme=\''+x[0]+'\';save();render()">'+x[1]+'</button>').join("")+'</div></div>'+
+ '<div class="card"><b>🌐 اللغة / Language</b><label>لغة التطبيق</label><select id="langpick" onchange="setLanguage(this.value)"><option value="ar">العربية (اللغة الرئيسية)</option><option value="bn">বাংলা (বাংলাদেশ)</option></select></div><div class="card"><b>🎨 المظهر</b><div class="row" style="margin-top:8px">'+[["auto","تلقائي"],["light","فاتح"],["dark","داكن"]].map(x=>'<button class="btn '+(t===x[0]?'':'s')+'" onclick="db.set.theme=\''+x[0]+'\';save();render()">'+x[1]+'</button>').join("")+'</div></div>'+
  '<div class="card"><b>⚙️ الإعدادات</b><label>اسم المحل</label><input value="'+esc(db.set.shop)+'" onchange="db.set.shop=this.value;save()"><label>رمز الدولة للواتساب (مثال 218)</label><input type="tel" dir="ltr" value="'+esc(db.set.cc)+'" onchange="db.set.cc=this.value.replace(/\\D/g,\'\');save()"><label>رقم واتساب الدعم</label><input type="tel" dir="ltr" value="'+esc(db.set.sup)+'" onchange="db.set.sup=this.value;save()"></div>'+
  '<div class="card"><b>💾 النسخ الاحتياطي</b><button class="btn" onclick="expJ()">تصدير (JSON)</button><button class="btn s" onclick="expC()">تصدير الطلبات (CSV)</button><label>استيراد ملف نسخة</label><input type="file" accept=".json" onchange="impJ(this)"></div><button class="btn g" onclick="support()">💬 الدعم الفني / شراء مفتاح</button>'}
+const _oldMore=more;function more(){_oldMore();const lp=$("#langpick");if(lp)lp.value=db.set.lang||"ar";applyLanguage();localizeNode($("#v"))}
 function fc(){const L=+$("#cl_").value||0,S=+$("#cs_").value||0,n=+$("#cn_").value||1;$("#fr").textContent=L||S?(((L+S+20)*n)/100).toFixed(2):0}
 function dl(name,txt){const a=document.createElement("a");a.href="data:text/plain;charset=utf-8,"+encodeURIComponent(txt);a.download=name;document.body.appendChild(a);a.click();a.remove();modal('<h3>النسخة جاهزة</h3><p class="mut">إن لم يبدأ التنزيل تلقائياً، انسخ النص واحفظه في ملف.</p><textarea id="ex" rows="6" readonly>'+esc(txt.slice(0,200000))+'</textarea><button class="btn" onclick="$(\'#ex\').select();copyT($(\'#ex\').value)">نسخ</button>')}
 function expJ(){dl("tailor-backup-"+new Date().toISOString().slice(0,10)+".json",JSON.stringify(db))}
 function expC(){const rows=[["رقم","الاسم","الهاتف","القماش","اللون","الإجمالي","العربون","المتبقي","التسليم","الحالة"]].concat(db.orders.map(o=>{const c=cust(o.cid);return[o.id,c.name,c.phone,o.fabric,o.color,o.total,o.dep,rem(o),o.due,o.status]}));dl("orders.csv","\ufeff"+rows.map(r=>r.map(x=>'"'+String(x??"").replace(/"/g,'""')+'"').join(",")).join("\n"))}
 function impJ(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);if(!d.customers||!d.orders)throw 0;if(!confirm("سيتم استبدال البيانات الحالية. متابعة؟"))return;db=d;db.set=db.set||{shop:"التارزي",cc:"",sup:"",theme:"auto"};save();toast("تمت الاستعادة ✅");setView("home")}catch(x){toast("ملف غير صالح")}};r.readAsText(f)}
 try{const mf={name:"التارزي",short_name:"التارزي",dir:"rtl",lang:"ar",display:"standalone",start_url:".",background_color:"#0f766e",theme_color:"#0f766e"};const l=document.createElement("link");l.rel="manifest";l.href=URL.createObjectURL(new Blob([JSON.stringify(mf)],{type:"application/json"}));document.head.appendChild(l)}catch(e){}
+applyLanguage();
 render();
 </script>
 </body>
