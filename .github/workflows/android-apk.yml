@@ -43,8 +43,8 @@ jobs:
               raise SystemExit("Generated Android build.gradle not found")
           s = p.read_text()
           number = int(os.environ["BUILD_NUMBER"])
-          s, c1 = re.subn(r'(?m)(\\bversionCode\\s+)\\d+', lambda m: m.group(1) + str(number), s, count=1)
-          s, c2 = re.subn(r'(?m)(\\bversionName\\s+)[\\"\\'][^\\"\\']*[\\"\\']', lambda m: m.group(1) + '"1.0.' + str(number) + '"', s, count=1)
+          s, c1 = re.subn(r'(?m)(\bversionCode\s+)\d+', lambda m: m.group(1) + str(number), s, count=1)
+          s, c2 = re.subn(r"""(?m)(\bversionName\s+)[\'"][^\'"]*[\'"]""", lambda m: m.group(1) + '"1.0.' + str(number) + '"', s, count=1)
           if c1 != 1 or c2 != 1:
               raise SystemExit(f"Could not set Android version (versionCode={c1}, versionName={c2})")
           p.write_text(s)
