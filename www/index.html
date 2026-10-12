@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%230f766e%22/%3E%3Ctext x=%2250%22 y=%2270%22 font-size=%2258%22 text-anchor=%22middle%22%3E✂️%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="app-icon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0f766e">
 <title>التارزي</title>
@@ -57,7 +57,7 @@ db.set = Object.assign({shop:"التارزي",cc:"",sup:"",theme:"auto",lang:"ar
 const save=()=>st.set("tl_db",db);
 const M=[["neck","الرقبة"],["shoulder","الكتف"],["chest","الصدر"],["waist","الوسط"],["hip","الورك"],["sleeve","الكم"],["length","الطول الكلي"],["cuff","محيط الكم"]];
 const FAB=["قطن","صوف","حرير","كتان","بوليستر","أخرى"];
-let view="home",q="";
+let view="new",q="";
 
 /* Language support: Arabic default + Bangla (Bangladesh) */
 db.set=db.set||{shop:"التارزي",cc:"",sup:"",theme:"auto"};
@@ -181,9 +181,9 @@ function setView(v){view=v;q="";render();scrollTo(0,0)}
 function render(){theme();const nv=$("#nv");
  if(!allowed()){nv.style.display="none";$("#hs").textContent="";$("#v").innerHTML='<div class="lock card"><div style="font-size:54px">🔒</div><h2>انتهت الفترة التجريبية</h2><p class="mut">أدخل مفتاح التفعيل للمتابعة</p><input id="lk" dir="ltr" placeholder="X-XXXX-XXXX-XXXX" style="text-align:center"><button class="btn" onclick="activate()">تفعيل</button><button class="btn g" onclick="support(\'مرحباً، أرغب بشراء مفتاح تفعيل لتطبيق التارزي\')">💬 شراء مفتاح عبر واتساب</button></div>';return}
  nv.style.display="flex";const l=lic();$("#hs").textContent=l?"":"تجربة: "+trialLeft()+" يوم";
- const tabs=[["home","🏠","الرئيسية"],["new","➕","طلب جديد"],["cust","👤","الزبائن"],["arch","📦","الأرشيف"],["more","🛠","أدوات"]];
+ const tabs=[["new","➕","طلب جديد"],["cust","👤","الزبائن"],["arch","📦","الأرشيف"],["more","🛠","أدوات"]];
  nv.innerHTML=tabs.map(t=>'<button class="'+(view===t[0]?'on':'')+'" onclick="'+(t[0]==="new"?'newOrder()':'setView(\''+t[0]+'\')')+'"><b>'+t[1]+'</b>'+t[2]+'</button>').join("");
- if(view==="home"){newOrder(0,0,true);view="home";nv.querySelectorAll("button").forEach((b,i)=>b.classList.toggle("on",i===0))}else if(view==="cust")customers();else if(view==="arch")archive();else if(view==="more")more()}
+ if(view==="new")newOrder(0,0,true);else if(view==="cust")customers();else if(view==="arch")archive();else if(view==="more")more()}
 function home(){const act=db.orders.filter(o=>o.status!=="delivered").sort((a,b)=>(a.due||"9").localeCompare(b.due||"9"));
  const urgent=act.filter(o=>o.status==="new"&&due(o).d<=2);
  $("#v").innerHTML='<input id="sq" placeholder="🔍 بحث بالاسم أو الهاتف أو رقم الطلب" value="'+esc(q)+'" oninput="q=this.value;homeList()"><div id="hl"></div>';homeList()}
