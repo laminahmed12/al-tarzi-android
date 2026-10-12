@@ -112,8 +112,8 @@ jobs:
                           result.put("ok", true);
                           result.put("name", safeName);
                       } catch (Exception e) {
-                          result.put("ok", false);
-                          result.put("error", e.getMessage() == null ? "فشل حفظ الملف" : e.getMessage());
+                          String message = e.getMessage() == null ? "فشل حفظ الملف" : e.getMessage();
+                          return "{\\"ok\\":false,\\"error\\":" + JSONObject.quote(message) + "}";
                       }
                       return result.toString();
                   }
