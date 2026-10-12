@@ -136,6 +136,7 @@ function theme(){
  root.style.setProperty("--onp",dark?"#101816":"#ffffff");
  const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.content=dark?acc.dark:acc.light;
 }
+const DAY=86400000;
 function parseKey(k){k=(k||"").trim().toUpperCase();const m=k.match(/^(L)-([A-Z2-9]{4})-([A-Z2-9]{4})-([A-Z0-9]{4})$/);if(!m)return null;return hash(m[1]+m[2]+m[3]+SECRET)===m[4]?{type:m[1]}:null}
 function lic(){const l=st.get("tl_lic",null);if(!l)return null;const ks=st.get("tl_keys",[]).find(x=>x.key===l.key);if(ks&&ks.revoked)return null;if(l.expiry&&Date.now()>l.expiry)return null;return l}
 function trialLeft(){return Math.ceil((st.get("tl_first",Date.now())+7*DAY-Date.now())/DAY)}
