@@ -75,7 +75,7 @@ jobs:
           import org.json.JSONObject;
           import java.io.OutputStream;
           """
-          package_end = s.find("\\n")
+          package_end = s.find("\n")
           s = s[:package_end+1] + imports + s[package_end+1:]
           needle = "public class MainActivity extends BridgeActivity {"
           if needle not in s:
