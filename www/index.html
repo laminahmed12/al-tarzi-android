@@ -2,7 +2,9 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%230f766e%22/%3E%3Ctext x=%2250%22 y=%2270%22 font-size=%2258%22 text-anchor=%22middle%22%3E✂️%3C/text%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
 <title>التارزي</title>
 <style>
 :root{--bg:#f6f4ef;--card:#fff;--tx:#1d2521;--mut:#6b746f;--pri:#0f766e;--onp:#fff;--bd:#e2ded4;--bad:#c0392b;--ok:#2e8b57;--warn:#d98a00;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -47,6 +49,11 @@ const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 const mem={};
 const st={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return k in mem?mem[k]:d}},set(k,v){mem[k]=v;try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 let db=st.get("tl_db",{customers:[],orders:[],seq:0,set:{shop:"التارزي",cc:"",sup:"",theme:"auto"}});
+db = db && typeof db === "object" ? db : {};
+db.customers = Array.isArray(db.customers) ? db.customers : [];
+db.orders = Array.isArray(db.orders) ? db.orders : [];
+db.seq = Number(db.seq) || 0;
+db.set = Object.assign({shop:"التارزي",cc:"",sup:"",theme:"auto",lang:"ar",acc:"teal"}, db.set && typeof db.set === "object" ? db.set : {});
 const save=()=>st.set("tl_db",db);
 const M=[["neck","الرقبة"],["shoulder","الكتف"],["chest","الصدر"],["waist","الوسط"],["hip","الورك"],["sleeve","الكم"],["length","الطول الكلي"],["cuff","محيط الكم"]];
 const FAB=["قطن","صوف","حرير","كتان","بوليستر","أخرى"];
@@ -118,8 +125,21 @@ const langObserver=new MutationObserver(ms=>{if(db.set.lang!=="bn")return;for(co
 langObserver.observe(document.body,{subtree:true,childList:true,characterData:true});
 function setLanguage(v){db.set.lang=v;save();applyLanguage();render();toast(v==="bn"?"ভাষা পরিবর্তন করা হয়েছে":"تم تحديث اللغة")}
 
-// theme
-function theme(){const t=db.set.theme;if(t==="auto")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",t)}
+// Theme palette + light/dark mode
+const PAL={teal:{light:"#0f766e",dark:"#2bb3a5"},blue:{light:"#1d4ed8",dark:"#7aa2ff"},purple:{light:"#7c3aed",dark:"#b794ff"},gold:{light:"#b45309",dark:"#f0b24a"},rose:{light:"#be123c",dark:"#fb7185"}};
+function theme(){
+ const root=document.documentElement,t=db.set.theme||"auto",acc=PAL[db.set.acc]||PAL.teal;
+ if(t==="auto")root.removeAttribute("data-theme");else root.setAttribute("data-theme",t);
+ let dark=t==="dark";
+ if(t==="auto"){try{dark=matchMedia("(prefers-color-scheme: dark)").matches}catch(e){dark=false}}
+ root.style.setProperty("--pri",dark?acc.dark:acc.light);
+ root.style.setProperty("--onp",dark?"#101816":"#ffffff");
+ const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.content=dark?acc.dark:acc.light;
+}
+function paletteCard(){
+ const colors=[["teal","فيروزي","#0f766e"],["blue","أزرق","#1d4ed8"],["purple","بنفسجي","#7c3aed"],["gold","ذهبي","#b45309"],["rose","وردي","#be123c"]];
+ return '<div class="card"><b>🎨 لون التطبيق</b><div class="grid" style="margin-top:8px">'+colors.map(x=>'<button class="btn" style="background:'+x[2]+';color:#fff;outline:'+((db.set.acc||"teal")===x[0]?'3px solid var(--tx)':'0')+'" onclick="db.set.acc=\''+x[0]+'\';save();render()">'+x[1]+'</button>').join("")+'</div></div>';
+}
 // license
 if(!st.get("tl_first",0))st.set("tl_first",Date.now());
 const DAY=864e5;
@@ -193,7 +213,7 @@ function saveOrder(){const name=$("#n").value.trim(),phone=$("#p").value.trim();
  if(editId)Object.assign(db.orders.find(x=>x.id===editId),d);else db.orders.push(Object.assign({id:++db.seq,status:"new",created:Date.now()},d));
  save();toast("تم الحفظ ✅");setView("home")}
 function more(){const t=db.set.theme;$("#v").innerHTML='<div class="card"><b>🧮 حاسبة القماش</b><div class="grid"><div><label>الطول الكلي (سم)</label><input id="cl_" type="number" inputmode="decimal" oninput="fc()"></div><div><label>طول الكم (سم)</label><input id="cs_" type="number" inputmode="decimal" oninput="fc()"></div></div><label>عدد القطع</label><input id="cn_" type="number" inputmode="numeric" value="1" oninput="fc()"><div style="font-size:20px">المطلوب: <b id="fr">0</b> متر</div><div class="mut">الحساب = (الطول + الكم + 20 سم زيادة للحياكة) × عدد القطع</div></div>'+
- '<div class="card"><b>🌐 اللغة / Language</b><label>لغة التطبيق</label><select id="langpick" onchange="setLanguage(this.value)"><option value="ar">العربية (اللغة الرئيسية)</option><option value="bn">বাংলা (বাংলাদেশ)</option></select></div><div class="card"><b>🎨 المظهر</b><div class="row" style="margin-top:8px">'+[["auto","تلقائي"],["light","فاتح"],["dark","داكن"]].map(x=>'<button class="btn '+(t===x[0]?'':'s')+'" onclick="db.set.theme=\''+x[0]+'\';save();render()">'+x[1]+'</button>').join("")+'</div></div>'+
+ '<div class="card"><b>🌐 اللغة / Language</b><label>لغة التطبيق</label><select id="langpick" onchange="setLanguage(this.value)"><option value="ar">العربية (اللغة الرئيسية)</option><option value="bn">বাংলা (বাংলাদেশ)</option></select></div>'+paletteCard()+'<div class="card"><b>🎨 المظهر</b><div class="row" style="margin-top:8px">'+[["auto","تلقائي"],["light","فاتح"],["dark","داكن"]].map(x=>'<button class="btn '+(t===x[0]?'':'s')+'" onclick="db.set.theme=\''+x[0]+'\';save();render()">'+x[1]+'</button>').join("")+'</div></div>'+
  '<div class="card"><b>⚙️ الإعدادات</b><label>اسم المحل</label><input value="'+esc(db.set.shop)+'" onchange="db.set.shop=this.value;save()"><label>رمز الدولة للواتساب (مثال 218)</label><input type="tel" dir="ltr" value="'+esc(db.set.cc)+'" onchange="db.set.cc=this.value.replace(/\\D/g,\'\');save()"><label>رقم واتساب الدعم</label><input type="tel" dir="ltr" value="'+esc(db.set.sup)+'" onchange="db.set.sup=this.value;save()"></div>'+
  '<div class="card"><b>💾 النسخ الاحتياطي</b><button class="btn" onclick="expJ()">تصدير (JSON)</button><button class="btn s" onclick="expC()">تصدير الطلبات (CSV)</button><label>استيراد ملف نسخة</label><input type="file" accept=".json" onchange="impJ(this)"></div><button class="btn g" onclick="support()">💬 الدعم الفني / شراء مفتاح</button>'}
 function fc(){const L=+$("#cl_").value||0,S=+$("#cs_").value||0,n=+$("#cn_").value||1;$("#fr").textContent=L||S?(((L+S+20)*n)/100).toFixed(2):0}
@@ -201,8 +221,9 @@ function dl(name,txt){const a=document.createElement("a");a.href="data:text/plai
 function expJ(){dl("tailor-backup-"+new Date().toISOString().slice(0,10)+".json",JSON.stringify(db))}
 function expC(){const rows=[["رقم","الاسم","الهاتف","القماش","اللون","الإجمالي","العربون","المتبقي","التسليم","الحالة"]].concat(db.orders.map(o=>{const c=cust(o.cid);return[o.id,c.name,c.phone,o.fabric,o.color,o.total,o.dep,rem(o),o.due,o.status]}));dl("orders.csv","\ufeff"+rows.map(r=>r.map(x=>'"'+String(x??"").replace(/"/g,'""')+'"').join(",")).join("\n"))}
 function impJ(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);if(!d.customers||!d.orders)throw 0;if(!confirm("سيتم استبدال البيانات الحالية. متابعة؟"))return;db=d;db.set=db.set||{shop:"التارزي",cc:"",sup:"",theme:"auto"};save();toast("تمت الاستعادة ✅");setView("home")}catch(x){toast("ملف غير صالح")}};r.readAsText(f)}
-try{const mf={name:"التارزي",short_name:"التارزي",dir:"rtl",lang:"ar",display:"standalone",start_url:".",background_color:"#0f766e",theme_color:"#0f766e"};const l=document.createElement("link");l.rel="manifest";l.href=URL.createObjectURL(new Blob([JSON.stringify(mf)],{type:"application/json"}));document.head.appendChild(l)}catch(e){}
+try{const mf={name:"التارزي",short_name:"التارزي",dir:"rtl",lang:"ar",display:"standalone",start_url:".",background_color:"#0f766e",theme_color:"#0f766e",icons:[{src:"data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%230f766e%22/%3E%3Ctext x=%2250%22 y=%2270%22 font-size=%2258%22 text-anchor=%22middle%22%3E✂️%3C/text%3E%3C/svg%3E",sizes:"any",type:"image/svg+xml"}]};const l=document.createElement("link");l.rel="manifest";l.href=URL.createObjectURL(new Blob([JSON.stringify(mf)],{type:"application/json"}));document.head.appendChild(l)}catch(e){}
 applyLanguage();
+theme();
 render();
 if(db.set.lang==="bn")localizeNode(document.body);
 </script>
