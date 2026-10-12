@@ -14,12 +14,8 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
-      - name: Restore original app HTML
-        run: |
-          mkdir -p www
-          cat source/index.b64.part* > /tmp/index.html.gz.b64
-          base64 -d /tmp/index.html.gz.b64 | gzip -d > www/index.html
-          test -s www/index.html
+      - name: Verify original app HTML is present
+        run: test -s www/index.html
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
