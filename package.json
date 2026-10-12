@@ -1,0 +1,16 @@
+{
+  "name": "tailor-android-wrapper",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Android WebView wrapper for the Arabic Tailor app",
+  "scripts": {
+    "android:sync": "cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "6.2.1",
+    "@capacitor/core": "6.2.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "6.2.1"
+  }
+}
