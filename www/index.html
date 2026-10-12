@@ -105,7 +105,7 @@ const LANG={
 " جاهز للاستلام من ":" সংগ্রহের জন্য প্রস্তুত, দোকান: ","المتبقي للدفع: ":"পরিশোধের বাকি: ",
 "اللغة / Language":"ভাষা / Language","العربية (اللغة الرئيسية)":"আরবি (প্রধান ভাষা)","বাংলা (বাংলাদেশ)":"বাংলা (বাংলাদেশ)",
 "مرحباً، أحتاج مساعدة في تطبيق التارزي":"হ্যালো, আল-তারজি অ্যাপ ব্যবহারে আমার সাহায্য দরকার",
-"مفتاح غير صالح":"অবৈধ অ্যাক্টিভেশন কী","هذا الجهاز على التجربة المجانية":"এই ডিভাইসটি বিনামূল্যের পরীক্ষামূলক সময়ে আছে"
+"مفتاح غير صالح":"অবৈধ অ্যাক্টিভেশন কী","هذا الجهاز على التجربة المجانية":"এই ডিভাইসটি বিনামূল্যের পরীক্ষামূলক সময়ে আছে",
 
 "لغة التطبيق":"অ্যাপের ভাষা","الزبون: ":"গ্রাহক: ","القماش: ":"কাপড়: ","المقاسات":"মাপ",
 "تم التسليم":"ডেলিভারি সম্পন্ন","إشعار الزبون":"গ্রাহককে জানান","إضافة طلب":"অর্ডার যোগ করুন",
@@ -190,7 +190,7 @@ function render(){theme();const nv=$("#nv");
  nv.style.display="flex";const l=lic();$("#hs").textContent=l?"":"تجربة: "+trialLeft()+" يوم";
  const tabs=[["home","🏠","الرئيسية"],["new","➕","طلب جديد"],["cust","👤","الزبائن"],["arch","📦","الأرشيف"],["more","🛠","أدوات"]];
  nv.innerHTML=tabs.map(t=>'<button class="'+(view===t[0]?'on':'')+'" onclick="'+(t[0]==="new"?'newOrder()':'setView(\''+t[0]+'\')')+'"><b>'+t[1]+'</b>'+t[2]+'</button>').join("");
- if(view==="home")home();else if(view==="cust")customers();else if(view==="arch")archive();else if(view==="more")more()}
+ if(view==="home"){newOrder();view="home";nv.querySelectorAll("button").forEach((b,i)=>b.classList.toggle("on",i===0))}else if(view==="cust")customers();else if(view==="arch")archive();else if(view==="more")more()}
 function home(){const act=db.orders.filter(o=>o.status!=="delivered").sort((a,b)=>(a.due||"9").localeCompare(b.due||"9"));
  const urgent=act.filter(o=>o.status==="new"&&due(o).d<=2);
  $("#v").innerHTML='<input id="sq" placeholder="🔍 بحث بالاسم أو الهاتف أو رقم الطلب" value="'+esc(q)+'" oninput="q=this.value;homeList()"><div id="hl"></div>';homeList()}
