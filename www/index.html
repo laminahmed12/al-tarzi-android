@@ -123,7 +123,7 @@ for(const c of node.childNodes)localizeNode(c)}
 function applyLanguage(){const bn=db.set.lang==="bn";document.documentElement.lang=bn?"bn-BD":"ar";document.documentElement.dir=bn?"ltr":"rtl";document.body.dir=bn?"ltr":"rtl";document.documentElement.style.fontFamily=bn?'system-ui,"Noto Sans Bengali","Noto Sans",sans-serif':''}
 const langObserver=new MutationObserver(ms=>{if(db.set.lang!=="bn")return;for(const m of ms){if(m.type==="childList")for(const n of m.addedNodes)localizeNode(n);else if(m.type==="characterData")localizeNode(m.target)}});
 langObserver.observe(document.body,{subtree:true,childList:true,characterData:true});
-function setLanguage(v){db.set.lang=v;save();applyLanguage();render();toast(v==="bn"?"ভাষা পরিবর্তন করা হয়েছে":"تم تحديث اللغة")}
+function setLanguage(v){db.set.lang=v;save();window.location.reload()}
 
 // Theme palette + light/dark mode
 const PAL={teal:{light:"#0f766e",dark:"#2bb3a5"},blue:{light:"#1d4ed8",dark:"#7aa2ff"},purple:{light:"#7c3aed",dark:"#b794ff"},gold:{light:"#b45309",dark:"#f0b24a"},rose:{light:"#be123c",dark:"#fb7185"}};
@@ -136,14 +136,6 @@ function theme(){
  root.style.setProperty("--onp",dark?"#101816":"#ffffff");
  const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.content=dark?acc.dark:acc.light;
 }
-function paletteCard(){
- const colors=[["teal","فيروزي","#0f766e"],["blue","أزرق","#1d4ed8"],["purple","بنفسجي","#7c3aed"],["gold","ذهبي","#b45309"],["rose","وردي","#be123c"]];
- return '<div class="card"><b>🎨 لون التطبيق</b><div class="grid" style="margin-top:8px">'+colors.map(x=>'<button class="btn" style="background:'+x[2]+';color:#fff;outline:'+((db.set.acc||"teal")===x[0]?'3px solid var(--tx)':'0')+'" onclick="db.set.acc=\''+x[0]+'\';save();render()">'+x[1]+'</button>').join("")+'</div></div>';
-}
-// license
-if(!st.get("tl_first",0))st.set("tl_first",Date.now());
-const DAY=864e5;
-const hash=s=>{let h=5381;for(const c of s)h=((h<<5)+h+c.charCodeAt(0))>>>0;return h.toString(36).toUpperCase().padStart(4,"0").slice(-4)};
 function parseKey(k){k=(k||"").trim().toUpperCase();const m=k.match(/^(L)-([A-Z2-9]{4})-([A-Z2-9]{4})-([A-Z0-9]{4})$/);if(!m)return null;return hash(m[1]+m[2]+m[3]+SECRET)===m[4]?{type:m[1]}:null}
 function lic(){const l=st.get("tl_lic",null);if(!l)return null;const ks=st.get("tl_keys",[]).find(x=>x.key===l.key);if(ks&&ks.revoked)return null;if(l.expiry&&Date.now()>l.expiry)return null;return l}
 function trialLeft(){return Math.ceil((st.get("tl_first",Date.now())+7*DAY-Date.now())/DAY)}
@@ -212,10 +204,10 @@ function saveOrder(){const name=$("#n").value.trim(),phone=$("#p").value.trim();
  const d={cid:c.id,fabric:$("#f").value,color:$("#c").value,img:draftImg,total:+$("#t").value,dep:+$("#d").value||0,due:$("#du").value,note:$("#no").value,m};
  if(editId)Object.assign(db.orders.find(x=>x.id===editId),d);else db.orders.push(Object.assign({id:++db.seq,status:"new",created:Date.now()},d));
  save();toast("تم الحفظ ✅");setView("home")}
-function more(){const t=db.set.theme;$("#v").innerHTML='<div class="card"><b>🧮 حاسبة القماش</b><div class="grid"><div><label>الطول الكلي (سم)</label><input id="cl_" type="number" inputmode="decimal" oninput="fc()"></div><div><label>طول الكم (سم)</label><input id="cs_" type="number" inputmode="decimal" oninput="fc()"></div></div><label>عدد القطع</label><input id="cn_" type="number" inputmode="numeric" value="1" oninput="fc()"><div style="font-size:20px">المطلوب: <b id="fr">0</b> متر</div><div class="mut">الحساب = (الطول + الكم + 20 سم زيادة للحياكة) × عدد القطع</div></div>'+
- '<div class="card"><b>🌐 اللغة / Language</b><label>لغة التطبيق</label><select id="langpick" onchange="setLanguage(this.value)"><option value="ar">العربية (اللغة الرئيسية)</option><option value="bn">বাংলা (বাংলাদেশ)</option></select></div>'+paletteCard()+'<div class="card"><b>🎨 المظهر</b><div class="row" style="margin-top:8px">'+[["auto","تلقائي"],["light","فاتح"],["dark","داكن"]].map(x=>'<button class="btn '+(t===x[0]?'':'s')+'" onclick="db.set.theme=\''+x[0]+'\';save();render()">'+x[1]+'</button>').join("")+'</div></div>'+
+function more(){$("#v").innerHTML='<div class="card"><b>🧮 حاسبة القماش</b><div class="grid"><div><label>الطول الكلي (سم)</label><input id="cl_" type="number" inputmode="decimal" oninput="fc()"></div><div><label>طول الكم (سم)</label><input id="cs_" type="number" inputmode="decimal" oninput="fc()"></div></div><label>عدد القطع</label><input id="cn_" type="number" inputmode="numeric" value="1" oninput="fc()"><div style="font-size:20px">المطلوب: <b id="fr">0</b> متر</div><div class="mut">الحساب = (الطول + الكم + 20 سم زيادة للحياكة) × عدد القطع</div></div>'+
+ '<div class="card"><b>🌐 اللغة / Language</b><label>لغة التطبيق</label><select id="langpick" onchange="setLanguage(this.value)"><option value="ar" '+(db.set.lang==="ar"?'selected':'')+'>العربية (اللغة الرئيسية)</option><option value="bn" '+(db.set.lang==="bn"?'selected':'')+'>বাংলা (বাংলাদেশ)</option></select></div>'+
  '<div class="card"><b>⚙️ الإعدادات</b><label>اسم المحل</label><input value="'+esc(db.set.shop)+'" onchange="db.set.shop=this.value;save()"><label>رمز الدولة للواتساب (مثال 218)</label><input type="tel" dir="ltr" value="'+esc(db.set.cc)+'" onchange="db.set.cc=this.value.replace(/\\D/g,\'\');save()"><label>رقم واتساب الدعم</label><input type="tel" dir="ltr" value="'+esc(db.set.sup)+'" onchange="db.set.sup=this.value;save()"></div>'+
- '<div class="card"><b>💾 النسخ الاحتياطي</b><button class="btn" onclick="expJ()">تصدير (JSON)</button><button class="btn s" onclick="expC()">تصدير الطلبات (CSV)</button><label>استيراد ملف نسخة</label><input type="file" accept=".json" onchange="impJ(this)"></div><button class="btn g" onclick="support()">💬 الدعم الفني / شراء مفتاح</button>'}
+ '<div class="card"><b>💾 النسخ الاحتياطي</b><button class="btn" onclick="expJ()">تصدير (JSON)</button><button class="btn s" onclick="expC()">تصدير الطلبات (CSV)</button><label>استيراد ملف نسخة</label><input type="file" accept=".json" onchange="impJ(this)"></div><button class="btn g" onclick="support()">💬 الدعم الفني / شراء مفتاح</button>';if(db.set.lang==="bn")localizeNode($("#v"));}
 function fc(){const L=+$("#cl_").value||0,S=+$("#cs_").value||0,n=+$("#cn_").value||1;$("#fr").textContent=L||S?(((L+S+20)*n)/100).toFixed(2):0}
 function dl(name,txt){const a=document.createElement("a");a.href="data:text/plain;charset=utf-8,"+encodeURIComponent(txt);a.download=name;document.body.appendChild(a);a.click();a.remove();modal('<h3>النسخة جاهزة</h3><p class="mut">إن لم يبدأ التنزيل تلقائياً، انسخ النص واحفظه في ملف.</p><textarea id="ex" rows="6" readonly>'+esc(txt.slice(0,200000))+'</textarea><button class="btn" onclick="$(\'#ex\').select();copyT($(\'#ex\').value)">نسخ</button>')}
 function expJ(){dl("tailor-backup-"+new Date().toISOString().slice(0,10)+".json",JSON.stringify(db))}
