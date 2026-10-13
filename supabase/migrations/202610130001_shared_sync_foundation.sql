@@ -128,7 +128,7 @@ with check (
   and updated_by = auth.uid()
   and exists (
     select 1 from public.tarzi_shop_members m
-    where m.shop_id = shop_id and m.user_id = auth.uid()
+    where m.shop_id = public.tarzi_sync_records.shop_id and m.user_id = auth.uid()
       and m.role in ('owner', 'worker')
   )
 );
